@@ -20,7 +20,7 @@ The goal is do segment different targets on the piano roll lead that carry infor
 Clone the repo and create a conda environment:
 
 ```bash
-git clone https://github.com/ace280/MIMUL-SAM-pirolease.git
+git clone https://github.com/ace280/MIMUL_SAM_pirolease.git
 cd MIMUL-SAM-pirolease
 
 conda create -n pirolease python=3.9
@@ -33,7 +33,7 @@ The following pytorch installation settings are used for testing:
 
 ![pytorch_selection](Assets/pytorch_selection.png)
 
-For your system however, another choice might be necessary.
+For your system however, another choice might be necessary. But if it is the same you can use the same insatll command: ```conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia```
 
 Finally install the required python modules
 
