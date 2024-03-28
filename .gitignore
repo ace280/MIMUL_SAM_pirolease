@@ -1,0 +1,49 @@
+# compilation and distribution
+__pycache__
+_ext
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dll
+*.egg-info/
+build/
+dist/
+wheels/
+
+# pytorch/python/numpy formats
+*.pth
+*.pkl
+*.npy
+*.ts
+model_ts*.txt
+
+# ipython/jupyter notebooks
+**/.ipynb_checkpoints/
+
+# onnx models
+*.onnx
+
+# editor settings and temp files
+.idea
+.vscode
+_darcs
+*.swn
+*.swo
+*.swp
+*~
+
+# input and output 
+weights/
+build/
+Input and Outputs/
+output/
+Testprojekt/
+data/
+work_dirs
+
+# OS files
+.DS_Store
+
+gradio_cached_examples
+

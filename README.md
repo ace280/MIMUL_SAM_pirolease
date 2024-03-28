@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This implementation of the Segment Anything Model is combined from a fork of the **['Fast Segment Anything Model (FastSAM)'](https://github.com/CASIA-IVA-Lab/FastSAM)** and the **['Personalize Segment Anything Model with One Shot'](https://github.com/ZrrSkywalker/Personalize-SAM)**. It is being developed in the context of a Bachelors Thesis in Digital Humanities at and with the help of the [research center Digital Organology at the Musikinstrumentenmuseum of the Universität Leipzig (MIMUL)](https://organology.uni-leipzig.de/).
+This implementation of the Segment Anything Model is combined from a fork of the **['Fast Segment Anything Model (FastSAM)'](https://github.com/CASIA-IVA-Lab/FastSAM)** and the **['Personalize Segment Anything Model with One Shot (PerSAM)'](https://github.com/ZrrSkywalker/Personalize-SAM)**. It is being developed in the context of a Bachelors Thesis in Digital Humanities at and with the help of the [research center Digital Organology at the Musikinstrumentenmuseum of the Universität Leipzig (MIMUL)](https://organology.uni-leipzig.de/).
 
 Both SAM implementations are combined here for mostly automated segmenting of [piano roll](https://en.wikipedia.org/wiki/Piano_roll)  leads. (Leads is the translation of the internally used german word 'Vorspann', comparative to a title page of a book or CD). Instead of using the full Segment Anything Model FastSAM and PerSAM where choosen mainly to save ressources. 
 
@@ -29,7 +29,7 @@ conda activate pirolease
 
 Similar to other Segment Anything implementations, this code requires `pytorch>=1.7` and `torchvision>=0.8`. Please follow the instructions [here](https://pytorch.org/get-started/locally/) to install both PyTorch and TorchVision dependencies.
 
-This project uses the following selection for testing:
+The following pytorch installation settings are used for testing:
 
 ![pytorch_selection](Assets/pytorch_selection.png)
 
@@ -49,6 +49,10 @@ Download the [model weights/checkpoints](https://speicherwolke.uni-leipzig.de/in
 A bigger subset of piano roll leads (approximately 3.400 files), only sorted by manufacturer, can be requested for download.
 
 Unzip and move all weights/checkpoints (*.pt and *.pth files) into the 'weights' folder. Copy the selection of pre sorted piano roll leads into the ```Input and Output``` folder. For deep testing reasons that folder transpires a higher level of complexity. For reference of its structure refer to ```Common Input and Output folders.txt``` and the generic example folder ```[mXpID_Manufacturer Name]``` within ```Input and Output``` Most importantly, input JPG files are put into the Input folder, while the instructions on what to segment for are provided via the CSV file. Essentially, the name of that file also provides the name of the target to be segmented and the lines in that CSV are providing the IDs, modes, and mode details for each picture in that (manufacturers) folder. Refer to the sample files for orientation.
+
+### A word on hardware
+
+This project runs on NVIDIA GeForce GTX 1060 and 1070 GPUs with 6 GB to 8 GB VRAM and 16 GB to 32 GB system RAM. Better graphics cards will certainly yield better results. For SAM to run, the VRAM and system RAM will be of most importance and should not be lower than 6 GB VRAM and 16 GB system RAM. If that lower threshold is the working setting, it should be considered to only use smaller sets of about five pictures as samples to not overload the system.
 
 ## Getting started
 
