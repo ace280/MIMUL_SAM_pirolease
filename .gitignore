@@ -34,10 +34,9 @@ _darcs
 *~
 
 # input and output 
-weights/
+weights/*
 build/
 Input and Outputs/
-output/
 Testprojekt/
 data/
 work_dirs
@@ -46,4 +45,8 @@ work_dirs
 .DS_Store
 
 gradio_cached_examples
+
+# keep dummy folders
+!Input and Outputs/[mXpID_Manufacturer Name]/*
+!weights/
 
