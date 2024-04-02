@@ -45,7 +45,3 @@ work_dirs
 .DS_Store
 
 gradio_cached_examples
-
-# keep dummy folders
-!Input and Outputs/[mXpID_Manufacturer Name]/*
-
