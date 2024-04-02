@@ -15,6 +15,23 @@ The goal is do segment different targets on the piano roll lead that carry infor
 
 ## Requirements
 
+Get a PC with at least a NVIDIA GeForce 1050. Install the latest drivers for it. It is advised to have your PC up to date. Install git and miniconda. Windows Terminal is advised for windows users. Debugging can be performed with Visual Studio Code and its Python Suite.
+
+You can follow the installation here: https://www.scivision.dev/conda-powershell-python/. Essentially you need these three commands (in Windows Terminal, Powershell, or CMD):
+
+```bash
+winget install --id=Anaconda.Miniconda3 -e
+
+conda update conda
+
+conda init
+```
+If this is the first time you are working with scripts on a Windows machine you will most likely have to allow their execution:
+
+```bash
+ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+```
+
 ### Installation
 
 Clone the repo and create a conda environment:
