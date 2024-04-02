@@ -37,10 +37,10 @@ def main():
     #path preparation
     input_path = f'{args.input_output_directory}/{args.manufacturer}/Input'
     fastsam_input_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/FastSAM results'
-    output_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/PerSAM results/input_{args.input}'
+    output_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/PerSAM results/{args.mode}/input_{args.input}'
 
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
+    # if not os.path.exists(output_path):
+    #     os.makedirs(output_path)
 
     chkpt = os.path.join(args.weights_directory + args.ckpt)
 
@@ -174,14 +174,21 @@ def persam(input_path, fastsam_input_path, output_path):
             show_points(topk_xy, topk_label, plt.gca())
             plt.title(f"Mask {best_idx}", fontsize=18)
             plt.axis('off')
-            vis_mask_output_path = os.path.join(output_path, f'vis_mask_{test_image_name}.jpg')
+            vis_mask_output_folder = os.path.join(output_path, 'Images')
+            if not os.path.exists(vis_mask_output_folder):
+                os.makedirs(vis_mask_output_folder, exist_ok=True)
+            vis_mask_output_path = os.path.join(vis_mask_output_folder,  f'vis_mask_{test_image_name}.jpg')
             with open(vis_mask_output_path, 'wb') as outfile:
                 plt.savefig(outfile, format='jpg')
 
             final_mask = masks[best_idx]
             mask_colors = np.zeros((final_mask.shape[0], final_mask.shape[1], 3), dtype=np.uint8)
             mask_colors[final_mask, :] = np.array([[0, 0, 128]])
-            mask_output_path = os.path.join(output_path, test_image_name + '.png')
+            masks_output_folder = os.path.join(output_path, 'Masks')
+            if not os.path.exists(masks_output_folder):
+                os.makedirs(masks_output_folder, exist_ok=True)
+            mask_output_path = os.path.join(masks_output_folder,  f'{test_image_name}.png')
+            # mask_output_path = os.path.join(output_path, 'Masks', test_image_name + '.png')
             cv2.imwrite(mask_output_path, mask_colors)
         else:
             print(f"{test_image_path} is not a picture file. Skipping.")

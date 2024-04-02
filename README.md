@@ -59,11 +59,11 @@ pip install -r requirements.txt
 ```
 ### Preparation
 
-Download the [model weights/checkpoints](https://speicherwolke.uni-leipzig.de/index.php/s/q7nTTdkgRpTNNoz) used for FastSam and PerSAM, as well as the [example piano roll leads folders](https://speicherwolke.uni-leipzig.de/index.php/s/2MeEJ8JrwBTRxZD) from the authors university cloud sorage.
+Download the [model weights/checkpoints](https://speicherwolke.uni-leipzig.de/index.php/s/q7nTTdkgRpTNNoz) used for FastSam and PerSAM, the [Input and Outputs](https://speicherwolke.uni-leipzig.de/index.php/s/kweqn7QJyMK6gQt) folder, as well as the [example piano roll leads](https://speicherwolke.uni-leipzig.de/index.php/s/2MeEJ8JrwBTRxZD) folder from the authors university cloud sorage.
 
 A bigger subset of piano roll leads (approximately 3.400 files), only sorted by manufacturer, can be requested for download.
 
-Unzip and move all weights/checkpoints (*.pt and *.pth files) into the 'weights' folder. Copy the selection of pre sorted piano roll leads into the ```Input and Output``` folder. For deep testing reasons that folder transpires a higher level of complexity. For reference of its structure refer to ```Common Input and Output folders.txt``` and the generic example folder ```[mXpID_Manufacturer Name]``` within ```Input and Output``` Most importantly, input JPG files are put into the Input folder, while the instructions on what to segment for are provided via the CSV file. Essentially, the name of that file also provides the name of the target to be segmented and the lines in that CSV are providing the IDs, modes, and mode details for each picture in that (manufacturers) folder. Refer to the sample files for orientation.
+Extract the ```weights``` folder and the ```Input and Outputs``` folder into yout MIMUL_SAM_Pirolease folder. Copy the selection of pre sorted piano roll leads into the ```Input and Output``` folder. The thorough testing of the programmes capabilities requires a rather high level of complexity for these folders. For reference check ```Common Input and Output folders.txt``` and the example folder ```[mXpID_Manufacturer Name]``` within ```Input and Output```. Most importantly, input JPG files are put into the Input folder, while the instructions on what to segment for are provided via CSV files. Essentially, the CSV files are named with the target to be segmented and the lines in that CSV are providing the IDs, modes, and mode details for each picture in that manufacturers folder. Refer to the sample files for orientation.
 
 ### A word on hardware
 

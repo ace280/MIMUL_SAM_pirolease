@@ -58,8 +58,8 @@ def csv_segmentation(csv_path, csv_file):
         reader = csv.DictReader(csvfile, dialect='excel', delimiter=';')
             
         for image in reader:
-            print (f"Step 2 skipped for image {image}.")
-            # perSAM(target, image)
+            # print (f"Step 2 skipped for image {image}.")
+            perSAM(target, image)
 
     print ("\nStep 3: Using FastSAM masks for PerSAM_f extraction (with some training).")
     with open(csv_file_path, newline='', encoding='utf-8-sig') as csvfile:
@@ -71,7 +71,7 @@ def csv_segmentation(csv_path, csv_file):
 
 def fastSAM(target, image):
 
-    id = image['ID']
+    id = image['ID'].strip('.jpg')
     mode = image['mode']
     mode_details = ""
     points = ""
@@ -95,7 +95,7 @@ def fastSAM(target, image):
     subprocess.run(f"python \".\FastSAM_MIMUL.py\" -d {args.device} -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode} {mode_details}")
 
 def perSAM(target, image):
-    id = image['ID']
+    id = image['ID'].strip('.jpg')
     mode = image['mode']
 
     print (f"\nTesting with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
@@ -104,7 +104,7 @@ def perSAM(target, image):
     subprocess.run(f"python \".\perSAM_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
 
 def perSAM_f(target, image):
-    id = image['ID']
+    id = image['ID'].strip('.jpg')
     mode = image['mode']
 
     print (f"Testing with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
