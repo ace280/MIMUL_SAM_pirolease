@@ -26,7 +26,7 @@ conda update conda
 
 conda init
 ```
-If this is the first time you are working with scripts on a Windows machine you will most likely have to allow their execution:
+If this is the first time you are working with scripts on a Windows machine you will most likely have to allow their execution. (User Powershell or Terminal with administrative rights.):
 
 ```bash
  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
@@ -44,7 +44,7 @@ conda create -n pirolease python=3.9
 conda activate pirolease
 ```
 
-Similar to other Segment Anything implementations, this code requires `pytorch>=1.7` and `torchvision>=0.8`. Please follow the instructions [here](https://pytorch.org/get-started/locally/) to install both PyTorch and TorchVision dependencies.
+Similar to other Segment Anything implementations, this code requires `pytorch>=1.7` and `torchvision>=0.8`. Please follow the instructions [here](https://pytorch.org/get-started/locally/) to install both PyTorch and TorchVision dependencies. Installing both PyTorch and TorchVision with CUDA support is strongly recommended.
 
 The following pytorch installation settings are used for testing:
 
@@ -58,8 +58,6 @@ Finally install the required python modules
 pip install -r requirements.txt
 ```
 ### Preparation
-
-Create the conda env. The code requires `python>=3.7`, as well as `pytorch>=1.7` and `torchvision>=0.8`. Please follow the instructions [here](https://pytorch.org/get-started/locally/) to install both PyTorch and TorchVision dependencies. Installing both PyTorch and TorchVision with CUDA support is strongly recommended.
 
 Download the [model weights/checkpoints](https://speicherwolke.uni-leipzig.de/index.php/s/q7nTTdkgRpTNNoz) used for FastSam and PerSAM, as well as the [example piano roll leads folders](https://speicherwolke.uni-leipzig.de/index.php/s/2MeEJ8JrwBTRxZD) from the authors university cloud sorage.
 
