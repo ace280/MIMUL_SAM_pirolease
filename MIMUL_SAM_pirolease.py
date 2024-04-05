@@ -42,37 +42,70 @@ def csv_segmentation(csv_path, csv_file):
     print (f"Found CSV {target} and set it as target.")
     print (f"Input and Outputs directory set to {args.input_output_directory}")
 
+    resumption_line = ''
+    resumption_path = f'{args.input_output_directory}/{args.manufacturer}/Resumption/resume_{target}.csv'
+    if os.path.exists(resumption_path):
+        with open(resumption_path, newline='', encoding='utf-8-sig') as resumption_csv:
+            resumption_reader = csv.DictReader(resumption_csv, dialect='excel', delimiter=';')
+            resumption_line = next(resumption_reader)
+
     csv_file_path = os.path.join(csv_path, csv_file)
 
-    print (f"\nStep 1: Segmenting target {target} with FastSAM")
-    with open(csv_file_path, newline='', encoding='utf-8-sig') as csvfile:
-        reader = csv.DictReader(csvfile, dialect='excel', delimiter=';')
+    print(int(resumption_line['step']))
 
-        for image in reader:
-            print (f"Step 1 skipped for image {image}.")
-            # fastSAM(target, image)
-        
+    if int(resumption_line['step']) <= 1:
 
-    print ("\nStep 2: Using FastSAM masks for PerSAM extraction")
-    with open(csv_file_path, newline='', encoding='utf-8-sig') as csvfile:
-        reader = csv.DictReader(csvfile, dialect='excel', delimiter=';')
-            
-        for image in reader:
-            # print (f"Step 2 skipped for image {image}.")
-            perSAM(target, image)
+        print (f"\nStep 1: Segmenting target {target} with FastSAM")
+        with open(csv_file_path, newline='', encoding='utf-8-sig') as instructions_csv:
+            instructions_reader = csv.DictReader(instructions_csv, dialect='excel', delimiter=';')
+
+            for image_line in instructions_reader:
+                if resumption_line['image'] == '' or resumption_line['image'] == image_line['image']:
+                    fastSAM(target, image_line)
+                # elif image == resumption_image:
+                #     # print (f"Continuing work from step one, image {image}.")
+                #     fastSAM(target, image)
+                else:
+                    print (f"Step 1 skipped for image {image_line['image']}.")
+    else: 
+        print(f"Step 1 skipped for target {target}")
+
+    if int(resumption_line.get("step")) <= 2: 
+
+        print ("\nStep 2: Using FastSAM masks for PerSAM extraction")
+        with open(csv_file_path, newline='', encoding='utf-8-sig') as instructions_csv:
+            instructions_reader = csv.DictReader(instructions_csv, dialect='excel', delimiter=';')
+
+            for image_line in instructions_reader:
+                if resumption_line['image'] == '' or resumption_line['image'] == image_line['image']:
+                    fastSAM(target, image_line)
+                # elif image == resumption_image:
+                #     # print (f"Continuing work from step one, image {image}.")
+                #     fastSAM(target, image)
+                    resumption_line['image'] = ''
+                else:
+                    print (f"Step 2 skipped for image {image_line['image']}.")
+    else: 
+        print(f"Step 2 skipped for target {target}")
 
     print ("\nStep 3: Using FastSAM masks for PerSAM_f extraction (with some training).")
-    with open(csv_file_path, newline='', encoding='utf-8-sig') as csvfile:
-        reader = csv.DictReader(csvfile, dialect='excel', delimiter=';')
+    with open(csv_file_path, newline='', encoding='utf-8-sig') as instructions_csv:
+        instructions_reader = csv.DictReader(instructions_csv, dialect='excel', delimiter=';')
 
-        for image in reader:
-            # print (f"Step 3 skipped for image {image}.")
-            perSAM_f(target, image)
+        for image_line in instructions_reader:
+                if resumption_line['image'] == '' or resumption_line.get['image'] == image_line['image']:
+                    fastSAM(target, image_line)
+                # elif image == resumption_image:
+                #     # print (f"Continuing work from step one, image {image}.")
+                #     fastSAM(target, image)
+                else:
+                    print (f"Step 1 skipped for image {image_line['image']}.")
 
-def fastSAM(target, image):
 
-    id = image['ID'].strip('.jpg')
-    mode = image['mode']
+def fastSAM(target, image_line):
+
+    id = image_line['image'].strip('.jpg')
+    mode = image_line['mode']
     mode_details = ""
     points = ""
     point_labels = ""
@@ -80,12 +113,12 @@ def fastSAM(target, image):
     print (f"Segmenting {target} from {id} of manufacturer {args.manufacturer} using {mode} mode.")
 
     if (mode == 'box'):
-        box = image['box']
+        box = image_line['box']
         mode_details = f"-b \"{box}\""
         print (f"Box input is {box}. Added mode details: \"{mode_details}\"")
     elif (mode == 'points'):
-        points = image['points']
-        point_labels = image['point_labels']
+        points = image_line['points']
+        point_labels = image_line['point_labels']
         mode_details = f"-p `\"{points}\" -pl \"{point_labels}\""
         print (f"Points input is \"{points}\" point labels are \"{point_labels}\". Added mode details: \"{mode_details}\"")
     else:
@@ -94,18 +127,18 @@ def fastSAM(target, image):
     print (f"\nCalling python \".\FastSAM_MIMUL.py\" -d {args.device} -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode} {mode_details}")
     subprocess.run(f"python \".\FastSAM_MIMUL.py\" -d {args.device} -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode} {mode_details}")
 
-def perSAM(target, image):
-    id = image['ID'].strip('.jpg')
-    mode = image['mode']
+def perSAM(target, image_line):
+    id = image_line['image'].strip('.jpg')
+    mode = image_line['mode']
 
     print (f"\nTesting with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
 
     print (f"Calling python \".\PerSAM_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
     subprocess.run(f"python \".\perSAM_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
 
-def perSAM_f(target, image):
-    id = image['ID'].strip('.jpg')
-    mode = image['mode']
+def perSAM_F(target, image_line):
+    id = image_line['image'].strip('.jpg')
+    mode = image_line['mode']
 
     print (f"Testing with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
 

@@ -21,7 +21,7 @@ def parse_args():
     args = parser.parse_args()
     print(f'args={args}')
 
-    print(f'Image to be processed: {args.input}.jpg')
+    print(f'Image to be processed: {args.input}')
     if(args.mode == 'box' and args.box != None):
         print(f'Box mode chosen; box={args.box}')
         args.box = convert_box_xywh_to_xyxy(ast.literal_eval(args.box))
