@@ -29,78 +29,73 @@ def main():
     if (args.manual):
         print ("Manual mode is not implemented yet.")
     else:
-        csv_path = f'{args.input_output_directory}/{args.manufacturer}/Input/CSV'
-        for csv_file in tqdm(os.listdir(csv_path)):
-            if '.csv' in csv_file or '.CSV' in csv_file:
-                csv_segmentation(csv_path, csv_file)
+        csv_iput = f'{args.input_output_directory}/{args.manufacturer}/Input/CSV'
+        csv_output = f'{args.input_output_directory}/{args.manufacturer}/Outputs/CSV'
+        for csv_file in tqdm(os.listdir(csv_iput)):
+            if '.csv' in csv_file or '.CSV' in csv_iput:
+                csv_segmentation(csv_iput, csv_output, csv_file)
             else:
                 print (f'The file {csv_file} is not a CSV-file. Please only put CSV-files into the CSV input folder.')
                         
-def csv_segmentation(csv_path, csv_file):
+def csv_segmentation(csv_iput, csv_output, csv_file):
 
     target = csv_file.split('.')[0]
-    print (f"Found CSV {target} and set it as target.")
+    print (f"Found CSV for target {target}.")
     print (f"Input and Outputs directory set to {args.input_output_directory}")
 
-    resumption_line = ''
-    resumption_path = f'{args.input_output_directory}/{args.manufacturer}/Resumption/resume_{target}.csv'
-    if os.path.exists(resumption_path):
-        with open(resumption_path, newline='', encoding='utf-8-sig') as resumption_csv:
-            resumption_reader = csv.DictReader(resumption_csv, dialect='excel', delimiter=';')
-            resumption_line = next(resumption_reader)
+    csv_input_path = os.path.join(csv_iput, csv_file)
+    csv_output_path = os.path.join(csv_output, csv_file)
 
-    csv_file_path = os.path.join(csv_path, csv_file)
+    print (f"\nStep 1: Segmenting target {target} with FastSAM")
+    with open(csv_input_path, newline='', encoding='utf-8-sig') as instructions_csv:
+        instructions_reader = csv.DictReader(instructions_csv, dialect='excel', delimiter=';')
+        with open(csv_output_path, 'w', newline='', encoding='utf-8-sig') as resumption_csv:
+            resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+            resumption_writer.writeheader()
+        for image_row in instructions_reader:
+            if image_row['done'] == '':
+                fastSAM(target, image_row)
+                image_row['done'] = 1
+                with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
+                    resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+                    resumption_writer.writerow(image_row)
+            else:
+                print (f"Step 1 skipped for image {image_row['image']}.")
+    os.replace(csv_output_path, csv_input_path)
 
-    print(int(resumption_line['step']))
-
-    if int(resumption_line['step']) <= 1:
-
-        print (f"\nStep 1: Segmenting target {target} with FastSAM")
-        with open(csv_file_path, newline='', encoding='utf-8-sig') as instructions_csv:
-            instructions_reader = csv.DictReader(instructions_csv, dialect='excel', delimiter=';')
-
-            for image_line in instructions_reader:
-                if resumption_line['image'] == '' or resumption_line['image'] == image_line['image']:
-                    fastSAM(target, image_line)
-                # elif image == resumption_image:
-                #     # print (f"Continuing work from step one, image {image}.")
-                #     fastSAM(target, image)
-                else:
-                    print (f"Step 1 skipped for image {image_line['image']}.")
-    else: 
-        print(f"Step 1 skipped for target {target}")
-
-    if int(resumption_line.get("step")) <= 2: 
-
-        print ("\nStep 2: Using FastSAM masks for PerSAM extraction")
-        with open(csv_file_path, newline='', encoding='utf-8-sig') as instructions_csv:
-            instructions_reader = csv.DictReader(instructions_csv, dialect='excel', delimiter=';')
-
-            for image_line in instructions_reader:
-                if resumption_line['image'] == '' or resumption_line['image'] == image_line['image']:
-                    fastSAM(target, image_line)
-                # elif image == resumption_image:
-                #     # print (f"Continuing work from step one, image {image}.")
-                #     fastSAM(target, image)
-                    resumption_line['image'] = ''
-                else:
-                    print (f"Step 2 skipped for image {image_line['image']}.")
-    else: 
-        print(f"Step 2 skipped for target {target}")
+    print ("\nStep 2: Using FastSAM masks for PerSAM extraction")
+    with open(csv_input_path, newline='', encoding='utf-8-sig') as instructions_csv:
+        instructions_reader = csv.DictReader(instructions_csv, dialect='excel', delimiter=';')
+        with open(csv_output_path, 'w', newline='', encoding='utf-8-sig') as resumption_csv:
+            resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+            resumption_writer.writeheader()
+        for image_row in instructions_reader:
+            if image_row['done'] == '' or int(image_row['done']) <= 1:
+                perSAM(target, image_row)
+                image_row['done'] = 2
+                with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
+                    resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+                    resumption_writer.writerow(image_row)
+            else:
+                print (f"Step 2 skipped for image {image_row['image']}.")
+    os.replace(csv_output_path, csv_input_path)
 
     print ("\nStep 3: Using FastSAM masks for PerSAM_f extraction (with some training).")
-    with open(csv_file_path, newline='', encoding='utf-8-sig') as instructions_csv:
+    with open(csv_input_path, newline='', encoding='utf-8-sig') as instructions_csv:
         instructions_reader = csv.DictReader(instructions_csv, dialect='excel', delimiter=';')
-
-        for image_line in instructions_reader:
-                if resumption_line['image'] == '' or resumption_line.get['image'] == image_line['image']:
-                    fastSAM(target, image_line)
-                # elif image == resumption_image:
-                #     # print (f"Continuing work from step one, image {image}.")
-                #     fastSAM(target, image)
-                else:
-                    print (f"Step 1 skipped for image {image_line['image']}.")
-
+        with open(csv_output_path, 'w', newline='', encoding='utf-8-sig') as resumption_csv:
+            resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+            resumption_writer.writeheader()
+        for image_row in instructions_reader:
+            if image_row['done'] == '' or int(image_row['done']) <= 2:
+                perSAM(target, image_row)
+                image_row['done'] = 3
+                with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
+                    resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+                    resumption_writer.writerow(image_row)
+            else:
+                print (f"Step 3 skipped for image {image_row['image']}.")
+    os.replace(csv_output_path, csv_input_path)
 
 def fastSAM(target, image_line):
 
