@@ -64,18 +64,36 @@ pip install -r requirements.txt
 ```
 ### Preparation
 
-Download the [model weights/checkpoints](https://speicherwolke.uni-leipzig.de/index.php/s/q7nTTdkgRpTNNoz) used for FastSam and PerSAM, the [Input and Outputs](https://speicherwolke.uni-leipzig.de/index.php/s/kweqn7QJyMK6gQt) folder, as well as the [example piano roll leads](https://speicherwolke.uni-leipzig.de/index.php/s/2MeEJ8JrwBTRxZD) folder from the authors university cloud sorage.
+- Download the [model weights/checkpoints](https://speicherwolke.uni-leipzig.de/index.php/s/q7nTTdkgRpTNNoz) used for FastSam and PerSAM
+- Download the [Input and Outputs](https://speicherwolke.uni-leipzig.de/index.php/s/kweqn7QJyMK6gQt) folder 
+- Download the [example piano roll leads](https://speicherwolke.uni-leipzig.de/index.php/s/2MeEJ8JrwBTRxZD) folder from the authors university cloud sorage.
 
 A bigger subset of piano roll leads (approximately 3.400 files), only sorted by manufacturer, can be requested for download.
 
-Extract the ```weights``` folder and the ```Input and Outputs``` folder into yout MIMUL_SAM_Pirolease folder. Copy the selection of pre sorted piano roll leads into the ```Input and Output``` folder. The thorough testing of the programmes capabilities requires a rather high level of complexity for these folders. For reference check ```Common Input and Output folders.txt``` and the example folder ```[mXpID_Manufacturer Name]``` within ```Input and Output```. Most importantly, input JPG files are put into the Input folder, while the instructions on what to segment for are provided via CSV files. Essentially, the CSV files are named with the target to be segmented and the lines in that CSV are providing the IDs, modes, and mode details for each picture in that manufacturers folder. Refer to the sample files for orientation.
+- Extract the ```weights``` folder and the ```Input and Outputs``` folder into yout MIMUL_SAM_Pirolease folder. 
+- Copy the selection of pre sorted piano roll leads into the ```Input and Output``` folder. 
+
+The thorough testing of the programmes capabilities requires a rather high level of complexity for these folders. For reference check ```Common Input and Output folders.txt``` and the example folder ```[mXpID_Manufacturer Name]``` within ```Input and Output```. Most importantly, input JPG files are put into the Input folder, while the instructions on what to segment for are provided via CSV files. Essentially, the CSV files are named with the target to be segmented and the lines in that CSV are providing the IDs, modes, and mode details for each picture in that manufacturers folder. Refer to the sample files for orientation.
 
 ### A word on hardware
 
-This project runs on NVIDIA GeForce GTX 1060 and 1070 GPUs with 6 GB to 8 GB VRAM and 16 GB to 32 GB system RAM. Better graphics cards will certainly yield better results. For SAM to run, the VRAM and system RAM will be of most importance and should not be lower than 6 GB VRAM and 16 GB system RAM. If that lower threshold is the working setting, it should be considered to only use smaller sets of about five pictures as samples to not overload the system.
+This project runs on NVIDIA GeForce GTX 1060 and 1070 GPUs with 6 GB to 8 GB VRAM and 16 GB to 32 GB system RAM. Better graphics cards will certainly yield results faster. The SAM needs high quantities of memory to run. Therefore the VRAM of the GPU and system system RAM will be of importance and should not be lower than 6 GB VRAM and 16 GB system RAM. If that lower threshold is the working setting, it should be considered to only use smaller sets of about five pictures as samples to not overload the system. (If the system runs out of RAM it will swap out the data to the virtual memory onto the hard drive your Pagefile resides at (so called hard faults). This is much slower than RAM and on an SSD it will degrade the SSD faster than necessary.) Higher CUDA versions will generally be better with memory management and less frequently result in crashes of the program.
 
 ## Getting started
 
+When the requirements are fullfilled and the installation as well as the preparation are complete, the first test run can start. The following workflow can be used as guidance on how to test the combined unaltered capabilities of FastSAM and PerSAM.
+
 ### Perfoming a complete test run
+
+Probably the most convenient way to run Pirolease for testing is within Visual Studio Code:
+- Use File -> Open Folder to open the MIMUL_SAM_pirolease folder
+- If you want to use breakpoints to debug open MIMUL_SAM_pirolease.py within Code
+[!TIP](If it is the first time working with Python in Visual Studio Code, install the Python extensions it will offer.)
+[!NOTE](The CSV-files are meant to be generated with Microsoft Excel. They can also be viewed and edited with Code. (Get the Rainbow CSV extension for visualization.) Be advised to omit all blanks bevor and after the seperator ';'. Else it will lead to errors.)
+- Go to the 'Run and Debug' view and [create a launch.json](https://code.visualstudio.com/docs/cpp/launch-json-reference)
+- [Set the Conda environment](https://code.visualstudio.com/docs/python/environments) to pirolease 
+[!TIP](You might run into 
+```OMP: Error #15: Initializing libiomp5md.dll, but found mk2iomp5md.dll already initialized.```.
+For this project the libiomp5.dll file was deleted os it could be reinitialized. Files by this name can reside in different folders within anaconda3. You can [check stackoverflow](https://stackoverflow.com/questions/20554074/sklearn-omp-error-15-initializing-libiomp5md-dll-but-found-mk2iomp5md-dll-a) if you want to know more.)
 
 ### Calling FastSAM or PerSAM on their own
