@@ -88,7 +88,7 @@ def csv_segmentation(csv_iput, csv_output, csv_file):
             resumption_writer.writeheader()
         for image_row in instructions_reader:
             if image_row['done'] == '' or int(image_row['done']) <= 2:
-                perSAM(target, image_row)
+                perSAM_F(target, image_row)
                 image_row['done'] = 3
             else:
                 print (f"Step 3 skipped for image {image_row['image']}.")

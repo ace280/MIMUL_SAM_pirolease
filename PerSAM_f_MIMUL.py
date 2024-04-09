@@ -20,7 +20,7 @@ def parse_args():
     
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-dd', '--data_directory', type=str, default='./data/')
+    parser.add_argument('-w', '--weights_directory', type=str, required=False, default='./weights/')
     parser.add_argument('-io', '--input_output_directory', type=str, required=True, help='Path to the working directory with inputs and outpus.')
     parser.add_argument('-ma', '--manufacturer', type=str, required=False, help='The piano roll manufacturer. This argument is for better sorting while testing')
     parser.add_argument('-t', '--target', type=str, required=True, help='The target that should be segmented. This is for sorting during the test phase.')
@@ -48,7 +48,7 @@ def main():
     # if not os.path.exists(output_path):
     #     os.makedirs(output_path)
 
-    chkpt = os.path.join(args.data_directory + args.ckpt)
+    chkpt = os.path.join(args.weights_directory + args.ckpt)
 
     if os.path.isfile(chkpt):
         print("Found Checkpoint.")
