@@ -83,17 +83,65 @@ This project runs on NVIDIA GeForce GTX 1060 and 1070 GPUs with 6 GB to 8 GB VRA
 
 When the requirements are fullfilled and the installation as well as the preparation are complete, the first test run can start. The following workflow can be used as guidance on how to test the combined unaltered capabilities of FastSAM and PerSAM.
 
-### Perfoming a complete test run
+### Prepare the debugging setup
 
 Probably the most convenient way to run Pirolease for testing is within Visual Studio Code:
 - Use File -> Open Folder to open the MIMUL_SAM_pirolease folder
 - If you want to use breakpoints to debug open MIMUL_SAM_pirolease.py within Code
-[!TIP](If it is the first time working with Python in Visual Studio Code, install the Python extensions it will offer.)
-[!NOTE](The CSV-files are meant to be generated with Microsoft Excel. They can also be viewed and edited with Code. (Get the Rainbow CSV extension for visualization.) Be advised to omit all blanks bevor and after the seperator ';'. Else it will lead to errors.)
+
+> [!TIP]
+> If it is the first time working with Python in Visual Studio Code, install the Python extensions it will offer.
+
+> [!NOTE]
+> The CSV-files are meant to be generated with Microsoft Excel. They can also be viewed and edited with Code. (Get the Rainbow CSV extension for visualization.) Be advised to omit all blanks bevor and after the seperator ';'. Else it will lead to errors.)
+
 - Go to the 'Run and Debug' view and [create a launch.json](https://code.visualstudio.com/docs/cpp/launch-json-reference)
+- You can use the [sample launch.json](https://speicherwolke.uni-leipzig.de/index.php/s/pa3YgtSgtFb9tTk) as reference.
 - [Set the Conda environment](https://code.visualstudio.com/docs/python/environments) to pirolease 
-[!TIP](You might run into 
-```OMP: Error #15: Initializing libiomp5md.dll, but found mk2iomp5md.dll already initialized.```.
+> [!TIP]
+> You might run into ```OMP: Error #15: Initializing libiomp5md.dll, but found mk2iomp5md.dll already initialized.```.
 For this project the libiomp5.dll file was deleted os it could be reinitialized. Files by this name can reside in different folders within anaconda3. You can [check stackoverflow](https://stackoverflow.com/questions/20554074/sklearn-omp-error-15-initializing-libiomp5md-dll-but-found-mk2iomp5md-dll-a) if you want to know more.)
 
+## Perfoming a complete test run
+
+For this example, the sample launch.json will be used. It is set to run a select group of images from the manufacturere '3030149_Woehle & Co'. (The numbers correspond to the ID within the musiXplora (mXp-ID).) 
+
+### Use the sample folder
+
+- The Folder ['Input and Outputs'](https://github.com/ace280/MIMUL_SAM_pirolease/tree/main?tab=readme-ov-file#preparation) contains the sample folder '[mXpID_Manufacturer Name]'
+- An overview of its structure with some explanation can also be viewed in 'Input and Output folders.txt'
+- When working with a new set of images you can copy the contents of the sample folder to apply the structure to your set
+ - The folder '3030149_Woehle & Co' should contain two folders 'Input' and 'Outputs' and their subfolders
+ - Move the images into 'Input'
+ - Remove the dummy file '[mXp-ID_suffix].jpg' to avoid errors when running pirolease
+ - 'Outputs' contains some dummy folders with names of possible targets. 
+  - They also contain dummy subfolders with dummy files to showcase the structure
+  - They can be kept or deleted.
+ - Both 'Input' and 'Outputs' contain a CSV folder (for details see below)
+
+### Create the CSV
+- Choose a (sub)set of piano roll leads and choose which visible element should be your target
+ - Bigger sets will need more VRAM and RAM. See [A word on hardware](https://github.com/ace280/MIMUL_SAM_pirolease/tree/main?tab=readme-ov-file#a-word-on-hardware) for details
+ - Targets tested in this project are content labels, license stamps, and the MIMUL stamp (given when cataloging)
+ - The better the contrast to the background is, the better the results will be
+- Open the CSV in 'Input' and enter the file names
+ - The fastest way is to use CMD, call ```dir /b [folder]``` and copy the lines into the excel sheet.
+- Find the Coordinates of your target
+ - For this project GIMP was used
+ - The rectangle select tool will show the necessary values
+- Enter the box values into the CSV
+ - simply copy the values out of the GIMP tool
+ - Refer to the sample CSV for reference
+- Rename the CSV to the target you want to segment
+- If more than one target shall be segmented, multiple CSV's can be created
+
 ### Calling FastSAM or PerSAM on their own
+
+- Enabling the user to call pirolease to perform single tasks is inted
+- Due to time constraints this feature is no implemented yet.
+
+## Known issues
+
+- These special characters are known to cause problems: 'ß'
+- Always use Quotes for paths. Every blank would break the concatenation of the path
+- 

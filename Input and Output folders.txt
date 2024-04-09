@@ -4,6 +4,7 @@
     |-- CSV/
       |-- [target].csv                  #CSV with list of instructions for current input. name = object on the music roll to be segmented
   |-- Outputs/
+    |-- CSV/                            #contains work in progress CSV
     |-- [target]/                       #name = object on the music roll to be segmented
       |-- FastSAM results/
         |-- [mode]/                     #method used: box or points
