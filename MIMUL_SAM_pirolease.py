@@ -39,6 +39,8 @@ def main():
                         
 def csv_segmentation(csv_iput, csv_output, csv_file):
 
+    os.makedirs(csv_output, exist_ok=True)
+
     target = csv_file.split('.')[0]
     print (f"Found CSV for target {target}.")
     print (f"Input and Outputs directory set to {args.input_output_directory}")
