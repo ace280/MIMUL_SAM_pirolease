@@ -15,7 +15,11 @@ The goal is do segment different targets on the piano roll lead that carry infor
 
 ## Requirements
 
-Get a PC with at least a NVIDIA GeForce 1060. Install the latest drivers for it. It is advised to have your PC up to date. Install git and miniconda. Windows Terminal with Powershell is advised for windows users. Debugging can be performed with Visual Studio Code and its Python extensions.
+Get a PC with at least a NVIDIA GeForce 1060. Install the latest drivers for it. Using Geforce Experience for the installation or update will usually work best. This will most likely also install CUDA 12.4. Older CUDA versions with older drivers may result in worse perfomance. For this project it was noticed that sharing RAM with the system failed with older CUDA versions. You can test your driver and CUDA versions by running ```nvidia-smi```:
+
+![nvidia-smi](Assets/nvidia-smi.png)
+
+ It is advised to have your PC up to date. Install git and miniconda. Windows Terminal with Powershell is advised for windows users. Debugging can be performed with Visual Studio Code and its Python extensions.
 
 You can follow the installation here: https://www.scivision.dev/conda-powershell-python/. Essentially you need these three commands (in Windows Terminal with Powershell, or CMD):
 
@@ -51,7 +55,7 @@ The following pytorch installation settings are used for testing:
 
 ![pytorch_selection](Assets/pytorch_selection.png)
 
-For your system however, another choice might be necessary. But if it is the same you can use the same insatll command: ```conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia```
+For your system however, another choice might be necessary. But if it is the same you can use the same insatll command: ```conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia```
 
 Finally install the required python modules
 
