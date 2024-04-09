@@ -56,11 +56,11 @@ def csv_segmentation(csv_iput, csv_output, csv_file):
             if image_row['done'] == '':
                 fastSAM(target, image_row)
                 image_row['done'] = 1
-                with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
-                    resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
-                    resumption_writer.writerow(image_row)
             else:
                 print (f"Step 1 skipped for image {image_row['image']}.")
+            with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
+                resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+                resumption_writer.writerow(image_row)
     os.replace(csv_output_path, csv_input_path)
 
     print ("\nStep 2: Using FastSAM masks for PerSAM extraction")
@@ -73,11 +73,11 @@ def csv_segmentation(csv_iput, csv_output, csv_file):
             if image_row['done'] == '' or int(image_row['done']) <= 1:
                 perSAM(target, image_row)
                 image_row['done'] = 2
-                with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
-                    resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
-                    resumption_writer.writerow(image_row)
             else:
                 print (f"Step 2 skipped for image {image_row['image']}.")
+            with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
+                resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+                resumption_writer.writerow(image_row)
     os.replace(csv_output_path, csv_input_path)
 
     print ("\nStep 3: Using FastSAM masks for PerSAM_f extraction (with some training).")
@@ -90,11 +90,11 @@ def csv_segmentation(csv_iput, csv_output, csv_file):
             if image_row['done'] == '' or int(image_row['done']) <= 2:
                 perSAM(target, image_row)
                 image_row['done'] = 3
-                with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
-                    resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
-                    resumption_writer.writerow(image_row)
             else:
                 print (f"Step 3 skipped for image {image_row['image']}.")
+            with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
+                resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+                resumption_writer.writerow(image_row)
     os.replace(csv_output_path, csv_input_path)
 
 def fastSAM(target, image_line):
