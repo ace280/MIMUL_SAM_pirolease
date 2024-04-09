@@ -32,15 +32,10 @@ def parse_args():
 
 def main():
 
-    # print("Args:", args)
-
     #path preparation
     input_path = f'{args.input_output_directory}/{args.manufacturer}/Input'
     fastsam_input_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/FastSAM results'
     output_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/PerSAM results/{args.mode}/input_{args.input}'
-
-    # if not os.path.exists(output_path):
-    #     os.makedirs(output_path)
 
     chkpt = os.path.join(args.weights_directory + args.ckpt)
 
@@ -188,10 +183,9 @@ def persam(input_path, fastsam_input_path, output_path):
             if not os.path.exists(masks_output_folder):
                 os.makedirs(masks_output_folder, exist_ok=True)
             mask_output_path = os.path.join(masks_output_folder,  f'{test_image_name}.png')
-            # mask_output_path = os.path.join(output_path, 'Masks', test_image_name + '.png')
             cv2.imwrite(mask_output_path, mask_colors)
         else:
-            print(f"{test_image_path} is not a picture file. Skipping.")
+            print(f"{test_image_path}not a file (probably a folder). Skipping.")
         
 
 

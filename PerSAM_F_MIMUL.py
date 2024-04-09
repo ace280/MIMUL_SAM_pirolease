@@ -38,15 +38,10 @@ def parse_args():
 
 def main():
 
-    # print("Args:", args)
-
     #path preparation
     input_path = f'{args.input_output_directory}/{args.manufacturer}/Input/'
     fastsam_input_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/FastSAM results'
     output_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/PerSAM_F results/{args.mode}/input_{args.input}'
-
-    # if not os.path.exists(output_path):
-    #     os.makedirs(output_path)
 
     chkpt = os.path.join(args.weights_directory + args.ckpt)
 
@@ -63,14 +58,8 @@ def persam_f(args, input_path, fastsam_input_path, output_path):
     print(f"\n------------> Segmenting {args.target} from {args.manufacturer} input {args.input} with FastSAM mask in {args.mode}-prompt mode.")
     
     # Path preparation
-    # ref_image_path = os.path.join(args.image_input, args.ref_idx + '.jpg')
     ref_image_path = f"{input_path}/{args.input}.jpg"
-    # ref_mask_path = os.path.join(args.mask_input, args.ref_idx + '.png')
     ref_mask_path = f"{fastsam_input_path}/{args.mode}/Masks/{args.input}.png"
-    # test_images_path = os.path.join(args.image_input, obj_name)
-
-    # args.output = os.path.join(args.output)
-    # os.makedirs(args.output, exist_ok=True)
 
     # Load images and masks
     ref_image = cv2.imread(ref_image_path)
@@ -85,10 +74,7 @@ def persam_f(args, input_path, fastsam_input_path, output_path):
     
     print("======> Loading SAM" )
     print(f'args.ckpt = {args.ckpt}')
-    # if args.sam_type == 'vit_h':
     if args.ckpt == 'sam_vit_h_4b8939.pth':
-        # sam_type, sam_ckpt = 'vit_h', 'sam_vit_h_4b8939.pth'
-        # sam = sam_model_registry[sam_type](checkpoint=sam_ckpt).cuda()
         sam = sam_model_registry['vit_h'](checkpoint=f'weights/{args.ckpt}').cuda()
     elif args.ckpt == 'mobile_sam.pt':
         sam_type, sam_ckpt = 'vit_t', 'weights/mobile_sam.pt'
@@ -275,7 +261,7 @@ def persam_f(args, input_path, fastsam_input_path, output_path):
             # mask_output_path = os.path.join(output_path, 'Masks', test_image_name + '.png')
             cv2.imwrite(mask_output_path, mask_colors)
         else:
-            print(f"{test_image_path} is not a picture file. Skipping.")
+            print(f"{test_image_path} is not a file (probably a folder). Skipping.")
 
 
 class Mask_Weights(nn.Module):

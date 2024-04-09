@@ -14,7 +14,7 @@ def parse_args():
     
     parser.add_argument('-man', '--manual', type=bool, required=False, help='Override flag for manual mode: ID, target and mode need to be provided with arguments. CSV will be ignored.')
     parser.add_argument('-t', '--target', type=str, required=False, help='The object that should be segmented.')
-    parser.add_argument('-i', '--input', type=str, required=False, help='The file name of the picture (without extention) to be segmented. (Only tested with JPG.)')
+    parser.add_argument('-i', '--input', type=str, required=False, help='The file name of the image (without extention) to be segmented. (Only tested with JPG.)')
     parser.add_argument('-m', '--mode', type=str, required=False, default='box', help='The mode to use for manually marking the location of the label or licence stamp. For box mode type \'box\'. for points mode use \'points\'.')
     parser.add_argument('-b', '--box', type=str, required=False, help='The box of the label or stamp. Requires format like in FastSAM: bbox default shape [0,0,0,0] -> [x1,y1,x2,y2] Example: box = [[1692, 882, 440, 508]]')
     parser.add_argument('-p', '--points', type=str, required=False, help='The points of the label or stamp. Requires format like in FastSAM. points default shapes: single point: [[0,0]] multiple points: [[x1,y1],[x2,y2]]')
