@@ -137,8 +137,8 @@ def perSAM_F(target, image_line):
 
     print (f"Testing with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
 
-    print (f"\nCalling python \".\PerSAM_f_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
-    subprocess.run(f"python \".\PerSAM_f_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
+    print (f"\nCalling python \".\PerSAM_F_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
+    subprocess.run(f"python \".\PerSAM_F_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
 
 
 
