@@ -3,6 +3,7 @@ from tqdm import tqdm
 import csv
 import os
 import subprocess
+import eval_mIoU_MIMUL
 
 def parse_args():
 
@@ -26,6 +27,8 @@ def parse_args():
 
 def main():
 
+    #add cleaning script to remove dummy files
+
     if (args.manual):
         print ("Manual mode is not implemented yet.")
     else:
@@ -47,6 +50,8 @@ def csv_segmentation(csv_iput, csv_output, csv_file):
 
     csv_input_path = os.path.join(csv_iput, csv_file)
     csv_output_path = os.path.join(csv_output, csv_file)
+
+    # add cleaner for header and clean dummy entries in first line
 
     print (f"\nStep 1: Segmenting target {target} with FastSAM")
     with open(csv_input_path, newline='', encoding='utf-8-sig') as instructions_csv:
@@ -99,10 +104,52 @@ def csv_segmentation(csv_iput, csv_output, csv_file):
                 resumption_writer.writerow(image_row)
     os.replace(csv_output_path, csv_input_path)
 
-def fastSAM(target, image_line):
+    print ("\nStep 4: Evaluating IoU and Accuracy between FastSAM and PerSAM masks.")
+    persam_mIoU, persam_mAcc, persam_f_mIoU, persam_f_mAcc  = 0, 0, 0, 0
+    count = 0
+    with open(csv_input_path, newline='', encoding='utf-8-sig') as instructions_csv:
+        instructions_reader = csv.DictReader(instructions_csv, dialect='excel', delimiter=';')
+        with open(csv_output_path, 'w', newline='', encoding='utf-8-sig') as resumption_csv:
+            resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+            resumption_writer.writeheader()
+        for image_row in instructions_reader:
+            if int(image_row['done']) <= 3:
+                persam_IoU, persam_Acc, persam_f_IoU, persam_f_Acc = eval_mIoU(target, image_row)
+                image_row['done'] = 4
+                image_row['persam_IoU'] = str(round(persam_IoU, 2))
+                image_row['persam_Acc'] = str(round(persam_Acc, 2))
+                image_row['persam_f_IoU'] = str(round(persam_f_IoU, 2))
+                image_row['persam_f_Acc'] = str(round(persam_f_Acc, 2))
+                persam_mIoU += persam_IoU
+                persam_mAcc += persam_Acc
+                persam_f_mIoU += persam_f_IoU
+                persam_f_mAcc += persam_f_Acc
+                count +=1
+            else:
+                print (f"Step 4 skipped for image {image_row['image']}.")
+            with open(csv_output_path, 'a', newline='', encoding='utf-8-sig') as resumption_csv:
+                resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
+                resumption_writer.writerow(image_row)
+    os.replace(csv_output_path, csv_input_path)
 
-    id = image_line['image'].strip('.jpg')
-    mode = image_line['mode']
+    if count > 0:
+
+        persam_mIoU = str(round(persam_mIoU / count, 2))
+        persam_mAcc = str(round(persam_mAcc / count, 2))
+
+        persam_f_mIoU = str(round(persam_f_mIoU / count, 2))
+        persam_f_mAcc = str(round(persam_f_mAcc / count, 2))
+
+        print(f"\nOverall PerSAM_mIoU for target {target}: {persam_mIoU}")
+        print(f"Overall PerSAM_mAcc for target {target}: {persam_mAcc}")
+
+        print(f"\nOverall PerSAM_F_mIoU for target {target}: {persam_f_mIoU}")
+        print(f"Overall PerSAM_F_mAcc for target {target}: {persam_f_mAcc}")
+
+def fastSAM(target, image_row):
+
+    id = image_row['image'].strip('.jpg')
+    mode = image_row['mode']
     mode_details = ""
     points = ""
     point_labels = ""
@@ -110,12 +157,12 @@ def fastSAM(target, image_line):
     print (f"Segmenting {target} from {id} of manufacturer {args.manufacturer} using {mode} mode.")
 
     if (mode == 'box'):
-        box = image_line['box']
+        box = image_row['box']
         mode_details = f"-b \"{box}\""
         print (f"Box input is {box}. Added mode details: \"{mode_details}\"")
     elif (mode == 'points'):
-        points = image_line['points']
-        point_labels = image_line['point_labels']
+        points = image_row['points']
+        point_labels = image_row['point_labels']
         mode_details = f"-p `\"{points}\" -pl \"{point_labels}\""
         print (f"Points input is \"{points}\" point labels are \"{point_labels}\". Added mode details: \"{mode_details}\"")
     else:
@@ -124,25 +171,37 @@ def fastSAM(target, image_line):
     print (f"\nCalling python \".\FastSAM_MIMUL.py\" -d {args.device} -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode} {mode_details}")
     subprocess.run(f"python \".\FastSAM_MIMUL.py\" -d {args.device} -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode} {mode_details}")
 
-def perSAM(target, image_line):
-    id = image_line['image'].strip('.jpg')
-    mode = image_line['mode']
+def perSAM(target, image_row):
+    id = image_row['image'].strip('.jpg')
+    mode = image_row['mode']
 
     print (f"\nTesting with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
 
     print (f"Calling python \".\PerSAM_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
     subprocess.run(f"python \".\perSAM_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
 
-def perSAM_F(target, image_line):
-    id = image_line['image'].strip('.jpg')
-    mode = image_line['mode']
+def perSAM_F(target, image_row):
+    id = image_row['image'].strip('.jpg')
+    mode = image_row['mode']
 
-    print (f"Testing with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
+    print (f"\nTesting with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
 
     print (f"\nCalling python \".\PerSAM_F_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
     subprocess.run(f"python \".\PerSAM_F_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
 
+def eval_mIoU(target, image_row):
+    id = image_row['image'].strip('.jpg')
+    mode = image_row['mode']
 
+    print (f"Evaluating mIoU for PerSAM and PerSAM_F results for ID {id} with FastSAM mask generated in {mode} mode for target {target}.")
+
+    # print (f"\nCalling python \".\eval_mIoU_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
+    # IoU = subprocess.check_output(f"python \".\eval_mIoU_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
+    
+    print (f"\npersam_IoU, persam_Acc, persam_f_IoU, persam_f_Acc = eval_mIoU_MIMUL.eval_mIoU({args.input_output_directory}, {args.manufacturer}, {target}, {mode}, {id})")
+    persam_IoU, persam_Acc, persam_f_IoU, persam_f_Acc = eval_mIoU_MIMUL.eval_mIoU(args.input_output_directory, args.manufacturer, target, mode, id)
+
+    return(persam_IoU, persam_Acc, persam_f_IoU, persam_f_Acc)
 
 if __name__ == "__main__":
     args = parse_args()

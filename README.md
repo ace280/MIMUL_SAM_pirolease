@@ -142,6 +142,7 @@ For this example, the sample launch.json will be used. It is set to run a select
 
 ## Known issues
 
-- These special characters are known to cause problems: 'ß'
+- These special characters are known to cause problems: 'ß', 'ä', 'ö', 'ü', 'é'. 
+
 - Always use Quotes for paths. Every blank would break the concatenation of the path
-- 
+- Excel will sometimes misinterpret the given CSV file and replace the seperator ';' wit the Tabulator. Easiest fix is find an replace in Visual Studio Code or your favorite text editor.

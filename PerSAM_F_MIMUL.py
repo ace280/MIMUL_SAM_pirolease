@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument('-io', '--input_output_directory', type=str, required=True, help='Path to the working directory with inputs and outpus.')
     parser.add_argument('-ma', '--manufacturer', type=str, required=False, help='The piano roll manufacturer. This argument is for better sorting while testing')
     parser.add_argument('-t', '--target', type=str, required=True, help='The target that should be segmented. This is for sorting during the test phase.')
-    parser.add_argument('-i', '--input', type=str, required=True, help='The file name of the picture and mask files (without extention) to be used as reference input. Picture needs to be JPG, Mask needs to be PNG in their respective folders.')
+    parser.add_argument('-i', '--input', type=str, required=True, help='The file name (ID) of the image and mask files (without extention) to be used as reference input. Image needs to be JPG, Mask needs to be PNG in their respective folders.')
     parser.add_argument('-m', '--mode', type=str, required=True, default='box', help='The mode that FastSAM used to create the mask. Needed to find the right folder.')
     parser.add_argument('-c', '--ckpt', type=str, default='sam_vit_h_4b8939.pth', help='Needed if another checkpoint shall be used.')
 

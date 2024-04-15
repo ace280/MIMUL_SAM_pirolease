@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import argparse
 from utils.tools import convert_box_xywh_to_xyxy
 import ast
+import cv2
+from PIL import Image
+import numpy as np
 
 def parse_args():
 
@@ -63,7 +66,54 @@ def main():
             mask = mask['segmentation']
         os.makedirs(f'{output_path}/Masks/', exist_ok=True)
         print(f"saving annotations mask {i} to folder {output_path}/Masks/")
+        # plt.colorbar()
         plt.imsave(f'{output_path}/Masks/{args.input}.png', mask)
+
+
+        im = Image.open(f'{output_path}/Masks/{args.input}.png')
+        data = np.array(im)
+
+        r1, g1, b1 = 68, 1, 84 # Original value
+        r2, g2, b2 = 0, 0, 0 # Value that we want to replace it with
+
+        red, green, blue = data[:,:,0], data[:,:,1], data[:,:,2]
+        mask = (red == r1) & (green == g1) & (blue == b1)
+        data[:,:,:3][mask] = [r2, g2, b2]
+
+        plt.imshow(im)
+
+        im = Image.fromarray(data)
+        im.save(f'{output_path}/Masks/{args.input}.png')
+
+        r1, g1, b1 = 253, 231, 36 # Original value
+        r2, g2, b2 = 128, 0, 0 # Value that we want to replace it with
+
+        red, green, blue = data[:,:,0], data[:,:,1], data[:,:,2]
+        mask = (red == r1) & (green == g1) & (blue == b1)
+        data[:,:,:3][mask] = [r2, g2, b2]
+
+        plt.imshow(im)
+
+        im = Image.fromarray(data)
+        im.save(f'{output_path}/Masks/{args.input}.png')
+
+        # violet=np.array([68,1,84])
+        # yellow=np.array([253,231,36])
+        # black=np.array([0,0,0])
+        # red=np.array([128,0,0])
+
+        # background_mask = cv2.inRange(hsv,violet,violet)
+        # plt.imshow(background_mask)
+        # foreground_mask = cv2.inRange(hsv,yellow,yellow)
+        # plt.imshow(foreground_mask)
+
+        # image[background_mask>0] = black
+        # image[foreground_mask>0] = red
+
+        # cv2.imwrite(f'{output_path}/Masks/{args.input}.png', mask)
+        # mask_colors = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
+        # mask_colors[mask, :] = np.array([[0, 0, 128]])
+        # cv2.imwrite(f'{output_path}/Masks/{args.input}.png', mask_colors)
 
     #save reference image
     os.makedirs(f'{output_path}/Images/', exist_ok=True)
