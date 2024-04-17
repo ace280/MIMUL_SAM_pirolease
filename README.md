@@ -95,7 +95,7 @@ Probably the most convenient way to run Pirolease for testing is within Visual S
 > [!NOTE]
 > The CSV-files are meant to be generated with Microsoft Excel. They can also be viewed and edited with Code. (Get the Rainbow CSV extension for visualization.) Be advised to omit all blanks bevor and after the seperator ';'. Else it will lead to errors.)
 
-- Go to the 'Run and Debug' view and [create a launch.json](https://code.visualstudio.com/docs/cpp/launch-json-reference)
+- Go to the 'Run and Debug' view and [create a launch.json]((https://code.visualstudio.com/docs/python/debugging))
 - You can use the [sample launch.json](https://speicherwolke.uni-leipzig.de/index.php/s/pa3YgtSgtFb9tTk) as reference.
 - [Set the Conda environment](https://code.visualstudio.com/docs/python/environments) to pirolease 
 > [!TIP]
