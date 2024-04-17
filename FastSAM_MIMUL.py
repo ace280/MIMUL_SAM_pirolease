@@ -60,15 +60,24 @@ def main():
         # point_label default [0] [1,0] 0:background, 1:foreground
         ann = prompt_process.point_prompt(points=list(args.points), pointlabel=list(args.point_labels))
 
-    #save mask
+    save_mask(ann,output_path)
+
+    #save reference image
+    os.makedirs(f'{output_path}/Images/', exist_ok=True)
+    print(f"Promting FastSAM for {args.input} using {args.mode}-promt")
+    prompt_process.plot(annotations=ann, output_path=f'{output_path}/Images/{args.input}.jpg',withContours=True)
+
+
+def save_mask(ann, output_path):
+
     for i, mask in enumerate(ann):
         if type(mask) == dict:
             mask = mask['segmentation']
+
         os.makedirs(f'{output_path}/Masks/', exist_ok=True)
         print(f"saving annotations mask {i} to folder {output_path}/Masks/")
-        # plt.colorbar()
-        plt.imsave(f'{output_path}/Masks/{args.input}.png', mask)
 
+        plt.imsave(f'{output_path}/Masks/{args.input}.png', mask)
 
         im = Image.open(f'{output_path}/Masks/{args.input}.png')
         data = np.array(im)
@@ -80,11 +89,6 @@ def main():
         mask = (red == r1) & (green == g1) & (blue == b1)
         data[:,:,:3][mask] = [r2, g2, b2]
 
-        plt.imshow(im)
-
-        im = Image.fromarray(data)
-        im.save(f'{output_path}/Masks/{args.input}.png')
-
         r1, g1, b1 = 253, 231, 36 # Original value
         r2, g2, b2 = 128, 0, 0 # Value that we want to replace it with
 
@@ -92,33 +96,9 @@ def main():
         mask = (red == r1) & (green == g1) & (blue == b1)
         data[:,:,:3][mask] = [r2, g2, b2]
 
-        plt.imshow(im)
-
         im = Image.fromarray(data)
         im.save(f'{output_path}/Masks/{args.input}.png')
 
-        # violet=np.array([68,1,84])
-        # yellow=np.array([253,231,36])
-        # black=np.array([0,0,0])
-        # red=np.array([128,0,0])
-
-        # background_mask = cv2.inRange(hsv,violet,violet)
-        # plt.imshow(background_mask)
-        # foreground_mask = cv2.inRange(hsv,yellow,yellow)
-        # plt.imshow(foreground_mask)
-
-        # image[background_mask>0] = black
-        # image[foreground_mask>0] = red
-
-        # cv2.imwrite(f'{output_path}/Masks/{args.input}.png', mask)
-        # mask_colors = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
-        # mask_colors[mask, :] = np.array([[0, 0, 128]])
-        # cv2.imwrite(f'{output_path}/Masks/{args.input}.png', mask_colors)
-
-    #save reference image
-    os.makedirs(f'{output_path}/Images/', exist_ok=True)
-    print(f"Promting FastSAM for {args.input} using {args.mode}-promt")
-    prompt_process.plot(annotations=ann, output_path=f'{output_path}/Images/{args.input}.jpg',withContours=True)
 
 if __name__ == "__main__":
     args = parse_args()
