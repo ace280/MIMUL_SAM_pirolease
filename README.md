@@ -95,16 +95,16 @@ Probably the most convenient way to run Pirolease for testing is within Visual S
 > [!NOTE]
 > The CSV-files are meant to be generated with Microsoft Excel. They can also be viewed and edited with Code. (Get the Rainbow CSV extension for visualization.) Be advised to omit all blanks bevor and after the seperator ';'. Else it will lead to errors.)
 
-- Go to the 'Run and Debug' view and [create a launch.json](https://code.visualstudio.com/docs/cpp/launch-json-reference)
+- Go to the 'Run and Debug' view and [create a launch.json](https://code.visualstudio.com/docs/python/debugging)
 - You can use the [sample launch.json](https://speicherwolke.uni-leipzig.de/index.php/s/pa3YgtSgtFb9tTk) as reference.
 - [Set the Conda environment](https://code.visualstudio.com/docs/python/environments) to pirolease 
 > [!TIP]
 > You might run into ```OMP: Error #15: Initializing libiomp5md.dll, but found mk2iomp5md.dll already initialized.```.
-For this project the libiomp5.dll file was deleted os it could be reinitialized. Files by this name can reside in different folders within anaconda3. You can [check stackoverflow](https://stackoverflow.com/questions/20554074/sklearn-omp-error-15-initializing-libiomp5md-dll-but-found-mk2iomp5md-dll-a) if you want to know more.)
+For this project the libiomp5.dll file was deleted os it could be reinitialized. Files by this name can reside in different folders within anaconda3. (You may [check stackoverflow](https://stackoverflow.com/questions/20554074/sklearn-omp-error-15-initializing-libiomp5md-dll-but-found-mk2iomp5md-dll-a) if you want to know more.)
 
 ## Perfoming a complete test run
 
-For this example, the sample launch.json will be used. It is set to run a select group of images from the manufacturere '3030149_Woehle & Co'. (The numbers correspond to the ID within the musiXplora (mXp-ID).) 
+For this example, the sample launch.json will be used. It is set to run a select group of images from the manufacturere '3030149_Woehle & Co'. (The numbers correspond to the [ID within the musiXplora (mXp-ID)](https://musixplora.de/mxp/3030149).) 
 
 ### Use the sample folder
 
