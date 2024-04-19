@@ -146,6 +146,13 @@ def csv_segmentation(csv_iput, csv_output, csv_file):
         print(f"\nOverall PerSAM_F_mIoU for target {target}: {persam_f_mIoU}")
         print(f"Overall PerSAM_F_mAcc for target {target}: {persam_f_mAcc}")
 
+        overall_eval_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{target}/overall_eval.csv'
+        with open(overall_eval_path, 'w', newline='', encoding='utf-8-sig') as eval_csv:
+            fieldnames = ['target', 'persam_mIoU', 'persam_mAcc', 'persam_f_mIoU', 'persam_f_mAcc']
+            eval_writer = csv.DictWriter(eval_csv, fieldnames=fieldnames, dialect='excel', delimiter=';')
+            eval_writer.writeheader()
+            eval_writer.writerow({'target': target, 'persam_mIoU': persam_mIoU, 'persam_mAcc': persam_mAcc, 'persam_f_mIoU': persam_f_mIoU, 'persam_f_mAcc': persam_f_mAcc})
+
 def fastSAM(target, image_row):
 
     id = image_row['image'].strip('.jpg')
@@ -193,7 +200,7 @@ def eval_mIoU(target, image_row):
     id = image_row['image'].strip('.jpg')
     mode = image_row['mode']
 
-    print (f"Evaluating mIoU for PerSAM and PerSAM_F results for ID {id} with FastSAM mask generated in {mode} mode for target {target}.")
+    print (f"Evaluating PerSAM and PerSAM_F results for ID {id} with FastSAM mask generated in {mode} mode for target {target}.")
 
     # print (f"\nCalling python \".\eval_mIoU_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
     # IoU = subprocess.check_output(f"python \".\eval_mIoU_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
