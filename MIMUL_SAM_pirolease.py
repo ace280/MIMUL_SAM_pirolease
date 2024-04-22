@@ -60,7 +60,7 @@ def csv_segmentation(csv_iput, csv_output, csv_file):
             resumption_writer = csv.DictWriter(resumption_csv, fieldnames=instructions_reader.fieldnames, dialect='excel', delimiter=';')
             resumption_writer.writeheader()
         for image_row in instructions_reader:
-            if image_row['done'] == '':
+            if image_row['done'] == '' or image_row['done'] == None:
                 fastSAM(target, image_row)
                 image_row['done'] = 1
             else:

@@ -146,3 +146,4 @@ For this example, the sample launch.json will be used. It is set to run a select
 
 - Always use Quotes for paths. Every blank would break the concatenation of the path
 - Excel will sometimes misinterpret the given CSV file and replace the seperator ';' wit the Tabulator. Easiest fix is find an replace in Visual Studio Code or your favorite text editor.
+- PerSAM will consume enormous amounts of RAM. The bigger the set of images, the more it will use. It might be possible to release some of the RAM during runtime at some point

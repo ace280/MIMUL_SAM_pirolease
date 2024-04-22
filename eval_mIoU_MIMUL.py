@@ -1,8 +1,6 @@
 import os
 import cv2
 import numpy as np
-from pathlib import Path
-import matplotlib.pyplot as plt
 import csv
 
 def eval_mIoU(input_output_directory, manufacturer, target, mode, id):
@@ -165,8 +163,6 @@ class AverageMeter(object):
 
 
 def intersectionAndUnion(output, target):
-    plt.imshow(target)
-    plt.imshow(output)
 
     assert (output.ndim in [1, 2, 3])
     assert output.shape == target.shape

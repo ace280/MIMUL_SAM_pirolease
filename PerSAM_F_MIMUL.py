@@ -14,7 +14,7 @@ warnings.filterwarnings('ignore')
 from show import *
 from per_segment_anything import sam_model_registry, SamPredictor
 
-
+import gc
 
 def parse_args():
     
@@ -250,7 +250,6 @@ def persam_f(args, input_path, fastsam_input_path, output_path):
             vis_mask_output_path = os.path.join(vis_mask_output_folder,  f'vis_mask_{test_image_name}.jpg')
             with open(vis_mask_output_path, 'wb') as outfile:
                 plt.savefig(outfile, format='jpg')
-
             final_mask = masks[best_idx]
             mask_colors = np.zeros((final_mask.shape[0], final_mask.shape[1], 3), dtype=np.uint8)
             mask_colors[final_mask, :] = np.array([[0, 0, 128]])
@@ -258,8 +257,8 @@ def persam_f(args, input_path, fastsam_input_path, output_path):
             if not os.path.exists(masks_output_folder):
                 os.makedirs(masks_output_folder, exist_ok=True)
             mask_output_path = os.path.join(masks_output_folder,  f'{test_image_name}.png')
-            # mask_output_path = os.path.join(output_path, 'Masks', test_image_name + '.png')
             cv2.imwrite(mask_output_path, mask_colors)
+            gc.collect
         else:
             print(f"{test_image_path} is not a file (probably a folder). Skipping.")
 

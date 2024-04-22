@@ -78,6 +78,7 @@ def save_mask(ann, output_path):
         print(f"saving annotations mask {i} to folder {output_path}/Masks/")
 
         plt.imsave(f'{output_path}/Masks/{args.input}.png', mask)
+        plt.close
 
         im = Image.open(f'{output_path}/Masks/{args.input}.png')
         data = np.array(im)
