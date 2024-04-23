@@ -13,10 +13,6 @@ warnings.filterwarnings('ignore')
 from show import *
 from per_segment_anything import sam_model_registry, SamPredictor
 
-import gc
-
-
-
 def parse_args():
     
     persam_parser = argparse.ArgumentParser()
@@ -185,7 +181,7 @@ def persam(input_path, fastsam_input_path, output_path):
                 os.makedirs(masks_output_folder, exist_ok=True)
             mask_output_path = os.path.join(masks_output_folder,  f'{test_image_name}.png')
             cv2.imwrite(mask_output_path, mask_colors)
-            gc.collect
+            plt.close(fig='all')
         else:
             print(f"{test_image_path}not a file (probably a folder). Skipping.")  
             
