@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import argparse
 from utils.tools import convert_box_xywh_to_xyxy
 import ast
-import cv2
 from PIL import Image
 import numpy as np
 
@@ -46,7 +45,7 @@ def main():
     model = FastSAM('./weights/FastSAM-x.pt')
     image_path = f'{args.input_output_directory}/{args.manufacturer}/Input/{args.input}.jpg'
     output_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/FastSAM results/{args.mode}/'
-    # DEVICE = 'CUDA'
+    # DEVICE = 'CUDA' or 'cpu'
     everything_results = model(image_path, device=args.device, retina_masks=True, imgsz=1024, conf=0.4, iou=0.9,)
     prompt_process = FastSAMPrompt(image_path, everything_results, device=args.device)
 

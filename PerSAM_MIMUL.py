@@ -17,6 +17,7 @@ def parse_args():
     
     persam_parser = argparse.ArgumentParser()
 
+    persam_parser.add_argument('-d', '--device', type=str,  required=False, default='cpu', help='The computing device to work on. To work on graphics card use \'CUDA\', default is \'cpu\'')
     persam_parser.add_argument('-w', '--weights_directory', type=str, required=False, default='./weights/')
     persam_parser.add_argument('-io', '--input_output_directory', type=str, required=True, help='Path to the working directory with inputs and outpus.')
     persam_parser.add_argument('-ma', '--manufacturer', type=str, required=False, help='The piano roll manufacturer.')
@@ -41,7 +42,6 @@ def main():
         print("Found Checkpoint.")
     else:
         print("Checkpoint not found.")    
-        #add error and break in case checkpoint not found
         
     persam(input_path, fastsam_input_path, output_path)
 
@@ -65,7 +65,10 @@ def persam(input_path, fastsam_input_path, output_path):
     print(f"\n======> Loading SAM" )
     if args.ckpt == 'sam_vit_h_4b8939.pth':
         print(f"Using vit_h checkpoint: {args.ckpt}")
-        sam = sam_model_registry['vit_h'](checkpoint=f'weights/{args.ckpt}').cuda()
+        if args.device == "CUDA":
+            sam = sam_model_registry['vit_h'](checkpoint=f'weights/{args.ckpt}').cuda()
+        else:
+            sam = sam_model_registry['vit_h'](checkpoint=f'weights/{args.ckpt}').cpu()
     elif args.ckpt == 'mobile_sam.pt':
         print(f"Using vit_t checkpoint: {args.ckpt}")
         device = "cuda" if torch.cuda.is_available() else "cpu"

@@ -27,8 +27,6 @@ def parse_args():
 
 def main():
 
-    #add cleaning script to remove dummy files
-
     if (args.manual):
         print ("Manual mode is not implemented yet.")
     else:
@@ -50,8 +48,6 @@ def csv_segmentation(csv_iput, csv_output, csv_file):
 
     csv_input_path = os.path.join(csv_iput, csv_file)
     csv_output_path = os.path.join(csv_output, csv_file)
-
-    # add cleaner for header and clean dummy entries in first line
 
     print (f"\nStep 1: Segmenting target {target} with FastSAM")
     with open(csv_input_path, newline='', encoding='utf-8-sig') as instructions_csv:
@@ -184,8 +180,8 @@ def perSAM(target, image_row):
 
     print (f"\nTesting with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
 
-    print (f"Calling python \".\PerSAM_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
-    subprocess.run(f"python \".\perSAM_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
+    print (f"Calling python \".\PerSAM_MIMUL.py\" -d \"{args.device}\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
+    subprocess.run(f"python \".\perSAM_MIMUL.py\" -d \"{args.device}\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
 
 def perSAM_F(target, image_row):
     id = image_row['image'].strip('.jpg')
@@ -193,8 +189,8 @@ def perSAM_F(target, image_row):
 
     print (f"\nTesting with input {id} and FastSAM mask generated in {mode} mode for target {target}.")
 
-    print (f"\nCalling python \".\PerSAM_F_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
-    subprocess.run(f"python \".\PerSAM_F_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
+    print (f"\nCalling python \".\PerSAM_F_MIMUL.py\" -d \"{args.device}\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
+    subprocess.run(f"python \".\PerSAM_F_MIMUL.py\" -d \"{args.device}\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
 
 def eval_mIoU(target, image_row):
     id = image_row['image'].strip('.jpg')
@@ -202,9 +198,6 @@ def eval_mIoU(target, image_row):
 
     print (f"Evaluating PerSAM and PerSAM_F results for ID {id} with FastSAM mask generated in {mode} mode for target {target}.")
 
-    # print (f"\nCalling python \".\eval_mIoU_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
-    # IoU = subprocess.check_output(f"python \".\eval_mIoU_MIMUL.py\" -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode}")
-    
     print (f"\npersam_IoU, persam_Acc, persam_f_IoU, persam_f_Acc = eval_mIoU_MIMUL.eval_mIoU({args.input_output_directory}, {args.manufacturer}, {target}, {mode}, {id})")
     persam_IoU, persam_Acc, persam_f_IoU, persam_f_Acc = eval_mIoU_MIMUL.eval_mIoU(args.input_output_directory, args.manufacturer, target, mode, id)
 

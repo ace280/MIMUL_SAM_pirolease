@@ -51,11 +51,11 @@ conda activate pirolease
 
 Similar to other Segment Anything implementations, this code requires `pytorch>=1.7` and `torchvision>=0.8`. Please follow the instructions [here](https://pytorch.org/get-started/locally/) to install both PyTorch and TorchVision dependencies. Installing both PyTorch and TorchVision with CUDA support is strongly recommended.
 
-The following pytorch installation settings are used for testing:
+The following pytorch installation settings are used by the author:
 
 ![pytorch_selection](Assets/pytorch_selection.png)
 
-For your system however, another choice might be necessary. But if it is the same you can use the same insatll command: ```conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia```
+If the system is comparable you can use the same install command: ```conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia``` If not however, another choice might be necessary. 
 
 Finally install the required python modules
 
@@ -138,7 +138,7 @@ For this example, the sample launch.json will be used. It is set to run a select
 ### Calling FastSAM or PerSAM on their own
 
 - Enabling the user to call pirolease to perform single tasks is inted
-- Due to time constraints this feature is no implemented yet.
+- Due to time constraints this feature is not implemented yet.
 
 ## Known issues
 
