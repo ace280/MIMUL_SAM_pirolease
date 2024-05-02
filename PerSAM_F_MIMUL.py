@@ -67,7 +67,10 @@ def persam_f(args, input_path, fastsam_input_path, output_path):
     ref_mask = cv2.cvtColor(ref_mask, cv2.COLOR_BGR2RGB)
 
     gt_mask = torch.tensor(ref_mask)[:, :, 0] > 0 
-    gt_mask = gt_mask.float().unsqueeze(0).flatten(1).cuda()
+    if args.device == "CUDA":
+        gt_mask = gt_mask.float().unsqueeze(0).flatten(1).cuda()
+    else:
+        gt_mask = gt_mask.float().unsqueeze(0).flatten(1).cpu()
 
     
     print("======> Loading SAM" )
@@ -122,7 +125,11 @@ def persam_f(args, input_path, fastsam_input_path, output_path):
 
     print('======> Start Training')
     # Learnable mask weights
-    mask_weights = Mask_Weights().cuda()
+
+    if args.device == "CUDA":
+        mask_weights = Mask_Weights().cuda()
+    else:
+        mask_weights = Mask_Weights().cpu()
     mask_weights.train()
     
     optimizer = torch.optim.AdamW(mask_weights.parameters(), lr=args.lr, eps=1e-4)

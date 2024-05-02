@@ -6,9 +6,10 @@ from utils.tools import convert_box_xywh_to_xyxy
 import ast
 from PIL import Image
 import numpy as np
+import logging
 
 def parse_args():
-
+    global args
     parser = argparse.ArgumentParser(prog='MIMUL FastSAM', description='Implements FastSAM for use on MIMUL Piano Roll heads.')
     parser.add_argument('-d', '--device', type=str,  required=False, default='cpu', help='The computing device to work on. To work on graphics card use \'CUDA\', default is \'cpu\'')
     parser.add_argument('-io', '--input_output_directory', type=str, required=True, help='Path to the working directory with inputs and outpus.')
@@ -21,7 +22,7 @@ def parse_args():
     parser.add_argument('-pl', '--point_labels', type=str, required=False, help='The point_label to define which points belong to the foreground and which belong to the background. Requires format like in FastSAM: point_label default [0] [1,0] 0:background, 1:foreground')
    
     args = parser.parse_args()
-    print(f'args={args}')
+    # print(f'args={args}')
 
     print(f'Image to be processed: {args.input}')
     if(args.mode == 'box' and args.box != None):
@@ -37,8 +38,26 @@ def parse_args():
         parser.error('Points mode requires the --points argument')
     elif(args.mode == 'points' and args.point_labels == None):
         parser.error('Points mode requires the --point_labels argument')
-    
-    return args
+
+def setup_logging():
+
+    try:
+        logging.basicConfig(level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s',
+            filename=f"{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/{args.target}.log",
+            filemode='a')
+        console = logging.StreamHandler()
+        console.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
+        console.setFormatter(formatter)
+        logging.getLogger('').addHandler(console)
+        # except logging.exception as le:
+        #     print(f"Exception while trying to start logging. Error: {le}")
+        # except FileNotFoundError as fnfe:
+        #     print(f"Error while trying to create or access log file could not be found. Error: {fnfe}")
+    except Exception as e:
+        # print(f"Unknown error while trying to start logging. Error: {e}")
+        print(f"Error while trying to start logging. Error: {e}")
 
 def main():
 
@@ -63,7 +82,7 @@ def main():
 
     #save reference image
     os.makedirs(f'{output_path}/Images/', exist_ok=True)
-    print(f"Promting FastSAM for {args.input} using {args.mode}-promt")
+    logging.info(f"Promting FastSAM for {args.input} using {args.mode}-promt")
     prompt_process.plot(annotations=ann, output_path=f'{output_path}/Images/{args.input}.jpg',withContours=True)
 
 
@@ -74,7 +93,7 @@ def save_mask(ann, output_path):
             mask = mask['segmentation']
 
         os.makedirs(f'{output_path}/Masks/', exist_ok=True)
-        print(f"saving annotations mask {i} to folder {output_path}/Masks/")
+        logging.info(f"saving annotations mask {i} to folder {output_path}/Masks/")
 
         plt.imsave(f'{output_path}/Masks/{args.input}.png', mask)
         plt.close
@@ -101,5 +120,6 @@ def save_mask(ann, output_path):
 
 
 if __name__ == "__main__":
-    args = parse_args()
+    parse_args()
+    setup_logging()
     main()
