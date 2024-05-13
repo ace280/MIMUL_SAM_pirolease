@@ -7,6 +7,8 @@ import ast
 from PIL import Image
 import numpy as np
 import logging
+import sys
+from pathlib import Path
 
 def parse_args():
     global args
@@ -51,22 +53,25 @@ def setup_logging():
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
         console.setFormatter(formatter)
         logging.getLogger('').addHandler(console)
-        # except logging.exception as le:
-        #     print(f"Exception while trying to start logging. Error: {le}")
-        # except FileNotFoundError as fnfe:
-        #     print(f"Error while trying to create or access log file could not be found. Error: {fnfe}")
+    except logging.exception as le:
+        print(f"Exception while trying to start logging. Error: {le}")
+    except FileNotFoundError as fnfe:
+        print(f"Error while trying to create or access the log file. Error: {fnfe}")
+    except PermissionError as pe:
+        print(f"Error with permissions of the logging file. Error: {pe}")
     except Exception as e:
-        # print(f"Unknown error while trying to start logging. Error: {e}")
         print(f"Error while trying to start logging. Error: {e}")
 
 def main():
 
     model = FastSAM('./weights/FastSAM-x.pt')
     image_path = f'{args.input_output_directory}/{args.manufacturer}/Input/{args.input}.jpg'
-    output_path = f'{args.input_output_directory}/{args.manufacturer}/Outputs/{args.target}/FastSAM results/{args.mode}/'
+    output_path = Path(args.input_output_directory) / args.manufacturer / 'Outputs' / args.target / 'FastSAM results' / args.mode
     # DEVICE = 'CUDA' or 'cpu'
+    logging.info('Generating everything results.')
     everything_results = model(image_path, device=args.device, retina_masks=True, imgsz=1024, conf=0.4, iou=0.9,)
     prompt_process = FastSAMPrompt(image_path, everything_results, device=args.device)
+    # output_path = Path(output_path)
 
     if args.mode=='box': 
         # bbox default shape [0,0,0,0] -> [x1,y1,x2,y2]
@@ -78,48 +83,62 @@ def main():
         # point_label default [0] [1,0] 0:background, 1:foreground
         ann = prompt_process.point_prompt(points=list(args.points), pointlabel=list(args.point_labels))
 
+
     save_mask(ann,output_path)
 
     #save reference image
-    os.makedirs(f'{output_path}/Images/', exist_ok=True)
+    os.makedirs(Path(output_path / 'Images'), exist_ok=True)
     logging.info(f"Promting FastSAM for {args.input} using {args.mode}-promt")
     prompt_process.plot(annotations=ann, output_path=f'{output_path}/Images/{args.input}.jpg',withContours=True)
 
 
 def save_mask(ann, output_path):
+    # path preparations
+    try:
+        masks_path = output_path / 'Masks'    
+        masks_path.mkdir(parents=True, exist_ok=True)
+    except OSError as ose:
+        logging.error (f"Error creating directories {output_path}/Masks/. Error: {ose}") 
+        raise Exception(f"OSError in FastSAM: {ose}")
+    except Exception as e:
+        logging.error(f"Unexpected error in FastSAM. Error: {e}")
+        raise Exception(f"Unexpected error in FastSAM: {e}")
 
     for i, mask in enumerate(ann):
-        if type(mask) == dict:
+        if isinstance(mask, dict):
             mask = mask['segmentation']
+        try:
+            logging.info(f"saving annotations mask {i} to folder {output_path}/Masks/")
+            mask_file = masks_path / f'{args.input}.png'            
+            plt.imsave(mask_file, mask)
+            plt.close()
 
-        os.makedirs(f'{output_path}/Masks/', exist_ok=True)
-        logging.info(f"saving annotations mask {i} to folder {output_path}/Masks/")
+            with Image.open(mask_file) as image:
+                image_data = np.array(image)
+                image = Image.fromarray(replace_colors(image_data))
+                image.save(mask_file)
+        except FileNotFoundError as fnfe:
+            logging.error(f"Error while trying to create or access the mask file(s). Error: {fnfe}")
+            raise Exception(f"FileNotFoundError in FastSAM: {fnfe}")
+        except PermissionError as pe:
+            logging.error(f"Error with permissions of the mask file(s). Error: {pe}")
+            raise Exception(f"PermissionError in FastSAM: {pe}")
+        except Exception as e:
+            logging.error(f"Error while replacing the masks colors. Error: {e}")
+            raise Exception(f"Error while replacing the masks colors. Error: {e}")
 
-        plt.imsave(f'{output_path}/Masks/{args.input}.png', mask)
-        plt.close
-
-        im = Image.open(f'{output_path}/Masks/{args.input}.png')
-        data = np.array(im)
-
-        r1, g1, b1 = 68, 1, 84 # Original value
-        r2, g2, b2 = 0, 0, 0 # Value that we want to replace it with
-
-        red, green, blue = data[:,:,0], data[:,:,1], data[:,:,2]
-        mask = (red == r1) & (green == g1) & (blue == b1)
-        data[:,:,:3][mask] = [r2, g2, b2]
-
-        r1, g1, b1 = 253, 231, 36 # Original value
-        r2, g2, b2 = 128, 0, 0 # Value that we want to replace it with
-
-        red, green, blue = data[:,:,0], data[:,:,1], data[:,:,2]
-        mask = (red == r1) & (green == g1) & (blue == b1)
-        data[:,:,:3][mask] = [r2, g2, b2]
-
-        im = Image.fromarray(data)
-        im.save(f'{output_path}/Masks/{args.input}.png')
-
+def replace_colors(image_data):
+    replacement_specs = [((68, 1, 84), (0, 0, 0)), ((253, 231, 36), (128, 0, 0))]
+    for (r1, g1, b1), (r2, g2, b2) in replacement_specs:
+        mask = (image_data[:,:,0] == r1) & (image_data[:,:,1] == g1) & (image_data[:,:,2] == b1)
+        image_data[:,:,:3][mask] = [r2, g2, b2]
+    return image_data
 
 if __name__ == "__main__":
-    parse_args()
-    setup_logging()
-    main()
+    try:
+        parse_args()
+        setup_logging()
+        main()
+    except Exception as e:
+        logging.error(f"Unforseen error occured at FastSAM (step 1). FastSAM terminated. Error: {e}")
+        sys.exit(1)

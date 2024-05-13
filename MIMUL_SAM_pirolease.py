@@ -1,10 +1,10 @@
 import argparse
-from tqdm import tqdm
 import csv
 import subprocess
 import eval_mIoU_MIMUL
 import logging
 from pathlib import Path
+import sys
 
 def parse_args():
     global args
@@ -39,22 +39,19 @@ def setup_logging(new_path=None, target=None):
             formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
             console.setFormatter(formatter)
             logging.getLogger('').addHandler(console)
-        # except logging.exception as le:
-        #     print(f"Exception while trying to start logging. Error: {le}")
-        # except FileNotFoundError as fnfe:
-        #     print(f"Error while trying to create or access log file could not be found. Error: {fnfe}")
+        except logging.exception as le:
+            print(f"Exception while trying to start logging. Error: {le}")
+        except FileNotFoundError as fnfe:
+            print(f"Error while trying to create or log file could not be found. Error: {fnfe}")
+        except PermissionError as pe:
+            print(f"Error with permissions of the logging file. Error: {pe}")
         except Exception as e:
-            # print(f"Unknown error while trying to start logging. Error: {e}")
             print(f"Error while trying to start logging. Error: {e}")
     else:
         new_path = Path(new_path)
         try: 
             new_path.mkdir(parents=True, exist_ok=True)
             new_path = new_path / f"{target}.log"
-            # console_handler = None
-            # for handler in logging.getLogger().handlers:
-            #     if isinstance(handler, logging.FileHandler):
-            #         logging.info (logging.getLogger().info)
             for handler in logging.getLogger().handlers:
                 if isinstance(handler, logging.FileHandler):
                     handler.close()
@@ -109,8 +106,8 @@ def csv_segmentation(csv_input_path, csv_output_path, target):
                 resumption_writer.writeheader()
             for image_row in instructions_reader:
                 if image_row['done'] == '' or image_row['done'] == None:
-                    returncode = fastSAM(target, image_row)
-                    if returncode == 0:
+                    result = fastSAM(target, image_row)
+                    if result.returncode == 0:
                         image_row['done'] = 1
                 else:
                     logging.info (f"Step 1 already done for image {image_row['image']}, skipped.")
@@ -119,8 +116,6 @@ def csv_segmentation(csv_input_path, csv_output_path, target):
                     resumption_writer.writerow(image_row)
         try:
             csv_output_path.replace(csv_input_path)
-        except FileNotFoundError as fnfe:
-            logging.error(f"Error finding the file(s) specified: {fnfe}")
         except PermissionError as pe:
             logging.error(f"Error with permission when trying to rename the file: {pe}")
     except FileNotFoundError as fnfe:
@@ -149,8 +144,6 @@ def csv_segmentation(csv_input_path, csv_output_path, target):
                     resumption_writer.writerow(image_row)
         try:
             csv_output_path.replace(csv_input_path)
-        except FileNotFoundError as fnfe:
-            logging.error(f"Error finding the file(s) specified: {fnfe}")
         except PermissionError as pe:
             logging.error(f"Error with permission when trying to rename the file: {pe}")
     except FileNotFoundError as fnfe:
@@ -178,8 +171,6 @@ def csv_segmentation(csv_input_path, csv_output_path, target):
                     resumption_writer.writerow(image_row)
         try:
             csv_output_path.replace(csv_input_path)
-        except FileNotFoundError as fnfe:
-            logging.error(f"Error finding the file(s) specified: {fnfe}")
         except PermissionError as pe:
             logging.error(f"Error with permission when trying to rename the file: {pe}")
     except FileNotFoundError as fnfe:
@@ -218,8 +209,6 @@ def csv_segmentation(csv_input_path, csv_output_path, target):
                     resumption_writer.writerow(image_row)
         try:
             csv_output_path.replace(csv_input_path)
-        except FileNotFoundError as fnfe:
-            logging.error(f"Error finding the file(s) specified: {fnfe}")
         except PermissionError as pe:
             logging.error(f"Error with permission when trying to rename the file: {pe}")
     except FileNotFoundError as fnfe:
@@ -274,7 +263,7 @@ def fastSAM(target, image_row):
 
     logging.info (f"Calling python \".\FastSAM_MIMUL.py\" -d {args.device} -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode} {mode_details}")
     try:
-        subprocess.run(f"python \".\FastSAM_MIMUL.py\" -d {args.device} -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode} {mode_details}")
+        return subprocess.run(f"python \".\FastSAM_MIMUL.py\" -d {args.device} -io \"{args.input_output_directory}\" -ma \"{args.manufacturer}\" -t {target} -i {id} -m {mode} {mode_details}")
     except subprocess.CalledProcessError as cpe:
         logging.error(f"Error while excecuting FastSAM subprocess with input {id} and FastSAM mask generated in {mode} mode for target {target}. Error: {cpe}")
         return -1
@@ -330,4 +319,8 @@ def eval_mIoU(target, image_row):
 if __name__ == "__main__":
     parse_args()
     setup_logging()
-    main()
+    try:
+        main()
+    except Exception as e:
+        logging.error(f"Critical error occured, pirolease terminated. Error: {e}")
+        sys.exit()
