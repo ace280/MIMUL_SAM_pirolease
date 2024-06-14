@@ -186,7 +186,7 @@ def persam(input_path, fastsam_input_path, output_path):
             cv2.imwrite(mask_output_path, mask_colors)
             plt.close(fig='all')
         else:
-            print(f"{test_image_path}not a file (probably a folder). Skipping.")  
+            print(f"{test_image_path} is not a file (probably a folder). Skipping.")  
             
 def point_selection(mask_sim, topk=1):
     # Top-1 point selection

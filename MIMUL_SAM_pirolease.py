@@ -256,7 +256,7 @@ def fastSAM(target, image_row):
     elif (mode == 'points'):
         points = image_row['points']
         point_labels = image_row['point_labels']
-        mode_details = f"-p `\"{points}\" -pl \"{point_labels}\""
+        mode_details = f"-p \"{points}\" -pl \"{point_labels}\""
         logging.info (f"Points input is \"{points}\" point labels are \"{point_labels}\". Added mode details: \"{mode_details}\"")
     else:
         logging.warning (f"Mode {mode} not supported. Please check spelling and choose either \"box\" or \"points\".")
@@ -317,9 +317,9 @@ def eval_mIoU(target, image_row):
     return(persam_IoU, persam_Acc, persam_f_IoU, persam_f_Acc)
 
 if __name__ == "__main__":
-    parse_args()
-    setup_logging()
     try:
+        parse_args()
+        setup_logging()
         main()
     except Exception as e:
         logging.error(f"Critical error occured, pirolease terminated. Error: {e}")
